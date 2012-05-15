@@ -6,7 +6,10 @@ import boto.manage.cmdshell
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+import simplejson
 import salt.client
+from fabfile import host_type
+from fabric.tasks import execute
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -14,11 +17,14 @@ script = open(os.path.join(DIR, 'scripts/salt_bootstrap.sh'))
 
 def hello(request):
     client = salt.client.LocalClient()
-    ret = client.cmd('*', 'test.ping')
+    ret = client.cmd('ip*', 'pkg.list_upgrades')
     #    out = ret['ip-10-152-251-59.ap-northeast-1.compute.internal']
     #    ret = client.cmd('*', 'test.ping', '--raw-out')
     return render_to_response('launch_instance.html', {'ret': ret})
 
+def view_run():
+    out = execute(host_type)
+    return HttpResponse(out)
 # The following function courtesy of Mitch Garnaat
 
 def launch_instance(ami='ami-60c77761',
@@ -131,6 +137,9 @@ def launch_instance(ami='ami-60c77761',
     # Find the actual Instance object inside the Reservation object
     # returned by EC2.
     instance = reservation.instances[0]
+
+    pub_dns = reservation.instances[0].public_dns_name
+    print pub_dns
     # The instance has been launched but it's not yet up and
     # running. Let's wait for its state to change to 'running'.
     print 'waiting for instance'
