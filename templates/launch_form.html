@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Launch EC2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="{{ STATIC_URL }}/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}/static/bootstrap/css/docs.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}/static/bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <button type="button"class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="brand" href="/">Home</a>
+            </div>
+        </div>
+    </div>
+
+</head>
+<body>
+<div class="page-header">
+<h1>Launch EC2 Instance</h1>
+</div>
+<form action="" method="post" class="form-horizontal">{% csrf_token %}
+    <fieldset>
+        <div class="control-group">
+            <label class="control-label"><strong>AMI</strong></label>
+            <div class="controls">
+                {{ form.ami_id }}
+                <p class="help-block"><i class="icon-info-sign"></i>
+                    As Ubuntu cloud images are uploaded and registered on the<br>
+                    Amazon EC2 cloud,they are referred to as AMI (Amazon Machine Images). <br>
+                    Each AMI is a machine template from which you can instantiate new servers.
+                </p>
+            </div>
+            <label class="control-label"><strong>Type</strong></label>
+
+            <div class="controls">
+                {{ form.instance_type }}
+                <p class="help-block"><i class="icon-info-sign"></i>
+                    <i>Micro Instance</i> - 613 MB of memory, up to 2 ECUs <br>
+                    (for short periodic bursts), EBS storage only, 32-bit or 64-bit platform.<br>
+                    <i>Small Instance</i> - 1.7 GB of memory, 1 EC2 Compute <br>
+                    Unit (1 virtual core with 1 EC2 Compute Unit), 160 GB of local <br>
+                    instance storage, 32-bit or 64-bit platform.
+                </p>
+            </div>
+            <label class="control-label"><strong>Key Pair</strong></label>
+            <div class="controls">
+                {{ form.keypair }}
+                <p class="help-block"><i class="icon-info-sign"></i>
+                    You use an Amazon EC2 key pair each time you launch an EC2 <br>
+                    Linux/UNIX or Windows instance. The key pair ensures that <br>
+                    only you have access to the instance. Each EC2 key pair <br>
+                    includes a key pair name, a private key file, and a public key file.
+                </p>
+            </div>
+            <label class="control-label"><strong>Tag</strong></label>
+            <div class="controls">
+                {{ form.tag}}
+                <p class="help-block"><i class="icon-info-sign"></i>
+                    To help you manage your Amazon EC2 instances, images, and other <br>
+                    Amazon EC2 resources, you can assign your own metadata to each
+                    resource in the form of <i>tags</i>.</p>
+            </div>
+        </div>
+        <div class='modal-footer'>
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="icon-play-circle icon-white"></i> <strong>Launch</strong>
+            </button>
+        </div>
+    </fieldset>
+
+</form>
+
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/jquery.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/google-code-prettify/prettify.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-transition.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-alert.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-modal.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-dropdown.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-scrollspy.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-tab.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-tooltip.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-popover.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-button.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-collapse.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-carousel.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/bootstrap-typeahead.js"></script>
+        <script src="{{ STATIC_URL }}/static/bootstrap/js/application.js"></script>
+
+</body>
+</html>

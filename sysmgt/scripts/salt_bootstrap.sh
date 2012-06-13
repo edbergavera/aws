@@ -10,3 +10,6 @@ apt-get upgrade -y
 cp /etc/salt/minion.template /etc/salt/minion
 sed -i -e 's/#master: salt/master: web.linuxd.org/' /etc/salt/minion
 salt-minion -d
+
+# Install Amazon SES scripts for email purposes
+#wget -q
