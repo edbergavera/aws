@@ -9,7 +9,9 @@ def instance_uptime(launch_time):
     """
     Computes the uptime in hours the instance is running.
     """
-    ts = datetime.datetime.strptime(launch_time[:19], "%Y-%m-%dT%H:%M:%S")
+    #ts = datetime.datetime.strptime(launch_time[:19], "%Y-%m-%dT%H:%M:%S")
+    import boto.utils
+    lt = boto.utils.parse_ts(launch_time)
     today = datetime.datetime.today()
     time_delta = today.now() - ts
     hours = time_delta.total_seconds() / 3600 - 8
