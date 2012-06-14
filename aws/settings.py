@@ -121,7 +121,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'sysmgt',
-    'gunicorn',
+    'django_tables2',
 
 )
 

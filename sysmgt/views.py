@@ -3,14 +3,14 @@ import os
 import time
 import datetime
 import boto
-import boto.manage.cmdshell
-from django.core.mail import send_mail
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 import salt.client
 import subprocess
 from sysmgt.forms import LaunchEC2Form
 from django.views.decorators.csrf import csrf_exempt
+from tables import EC2ClientsTable
+
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -42,10 +42,14 @@ def disk_usage(request):
     ret = client.cmd('T2*', 'cmd.run', ['df -hT'])
     return render_to_response('index.html', {'ret' : ret})
 
-def manage():
-    pass
+def manage(request):
 
-# create an Ubuntu instance
+    table = EC2ClientsTable(retrieve_all_simpledb())
+
+    return render_to_response('manage.html', {'table' : table})
+
+#############################################################################################3
+# Create an Ubuntu instance
 
 def launch_instance(ami, instance_type, key_name, tag):
     """
@@ -86,8 +90,8 @@ def launch_instance(ami, instance_type, key_name, tag):
             # The save method will also chmod the file to protect
             # your private key.
             key.save('~/.ssh')
-        else:
-            raise
+#        else:
+#            raise
 #    os.chown(os.path.join(os.path.expanduser('~/.ssh'),key_name+'.pem'),1000,1000)
     # Now start up the instance. The run_instances method
     # has many, many parameters but these are all we need
@@ -127,6 +131,7 @@ def store_to_simpledb(instance_id):
     # record id is item_name
     item_name = instance.id
     item_attrs = {'hostname' : instance.private_dns_name,
+                  'instance_id' : instance.id,
                   'state' : instance.state,
                   'ami_id' : instance.image_id,
                   'platform':  __platform__[instance.image_id],
@@ -141,6 +146,16 @@ def store_to_simpledb(instance_id):
 
     dom.put_attributes(item_name, item_attrs)
 
+def retrieve_all_simpledb():
+
+    sdb = boto.connect_sdb()
+    dom = sdb.get_domain('ec2_clients')
+    item_list = []
+    for item in dom:
+        item_list.append(dom.get_attributes(item.name))
+
+    return item_list
+
 def refresh_db(instance_id):
 
     conn = boto.connect_ec2()
@@ -151,11 +166,6 @@ def refresh_db(instance_id):
     # store new values to simpledb
     store_to_simpledb(instance.id)
 
-def retrieve_simpledb(instance_id):
-
-    sdb = boto.connect_sdb()
-    dom = sdb.get_domain('ec2_clients')
-    return dom.get_attributes(instance_id)
 
 
 def instance_uptime(launch_time):
@@ -184,17 +194,31 @@ def reboot(instance_id):
 
 def stop(instance_id):
     conn = boto.connect_ec2()
-    conn.stop_instances([instance_id])
+    reservations = conn.get_all_instances([instance_id])
+    instance = reservations[0].instances[0]
+    instance.stop()
+    while instance.state != 'stopped':
+        time.sleep(5)
+        instance.update()
+    store_to_simpledb(instance.id)
 
 def start(instance_id):
     conn = boto.connect_ec2()
-    conn.start_instances([instance_id])
+    reservations = conn.get_all_instances([instance_id])
+    instance = reservations[0].instances[0]
+    instance.start()
+    while instance.state != 'running':
+        time.sleep(5)
+        instance.update()
+    store_to_simpledb(instance.id)
 
 def terminate(instance_id):
     conn = boto.connect_ec2()
-    conn.terminate_instances(instance_id)
+    reservations = conn.get_all_instances([instance_id])
+    instance = reservations[0].instances[0]
+    instance.terminate()
     #update database after an instance is terminated
-    delete_item(instance_id)
+    delete_item(instance.id)
 
 def console_output(instance_id):
     """
@@ -215,5 +239,21 @@ def delete_item(instance_id):
         if instance_id == item.name:
             dom.delete_item(item)
 
+def clear_items_simpledb():
 
+    sdb = boto.connect_sdb()
+    dom = sdb.get_domain('ec2_clients')
+
+    for item in dom:
+        dom.delete_item(item)
+
+def retrieve_all_simpledb():
+
+    sdb = boto.connect_sdb()
+    dom = sdb.get_domain('ec2_clients')
+    item_list = []
+    for item in dom:
+        item_list.append(dom.get_attributes(item.name))
+
+    return item_list
 
