@@ -26,8 +26,8 @@ def launch(request):
             keypair = form.cleaned_data['keypair']
             tag_name = form.cleaned_data['tag']
             instance_id = launch_instance(ami=ami_id,instance_type=instanceType,key_name=keypair,tag=tag_name)
-            html = "<html><body>Instance ID: %s</body></html>"% instance_id
-            return HttpResponse(html)
+
+            return HttpResponseRedirect('')
     else:
         form = LaunchEC2Form()
     return render_to_response('launch_form.html', {'form': form})
@@ -41,6 +41,11 @@ def disk_usage(request):
     client = salt.client.LocalClient()
     ret = client.cmd('T2*', 'cmd.run', ['df -hT'])
     return render_to_response('index.html', {'ret' : ret})
+
+def server_details(request, instance_id):
+
+    details = retrieve_instance_simpledb(instance_id)
+    return render_to_response('server_details.html', {'details' : details})
 
 def manage(request):
 
@@ -146,6 +151,12 @@ def store_to_simpledb(instance_id):
 
     dom.put_attributes(item_name, item_attrs)
 
+def retrieve_instance_simpledb(instance_id):
+    sdb = boto.connect_sdb()
+    dom = sdb.get_domain('ec2_clients')
+
+    return dom.get_attributes(instance_id)
+
 def retrieve_all_simpledb():
 
     sdb = boto.connect_sdb()
@@ -246,14 +257,3 @@ def clear_items_simpledb():
 
     for item in dom:
         dom.delete_item(item)
-
-def retrieve_all_simpledb():
-
-    sdb = boto.connect_sdb()
-    dom = sdb.get_domain('ec2_clients')
-    item_list = []
-    for item in dom:
-        item_list.append(dom.get_attributes(item.name))
-
-    return item_list
-
