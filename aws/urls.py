@@ -18,4 +18,5 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
     url(r'^launch/$', views.launch),
     url(r'^manage/$', views.manage),
+    url(r'^manage/(?P<instance_id>[-\w]+)/$', views.server_details),
 )

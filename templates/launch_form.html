@@ -35,7 +35,7 @@
     <fieldset>
         <div class="control-group">
             <label class="control-label"><strong>AMI</strong></label>
-            <div class="controls">
+            <div class="controls" id="ami_id">
                 {{ form.ami_id }}
                 <p class="help-block"><i class="icon-info-sign"></i>
                     As Ubuntu cloud images are uploaded and registered on the<br>
@@ -43,6 +43,7 @@
                     Each AMI is a machine template from which you can instantiate new servers.
                 </p>
             </div>
+        </div>
             <label class="control-label"><strong>Type</strong></label>
 
             <div class="controls">
@@ -73,8 +74,7 @@
                     Amazon EC2 resources, you can assign your own metadata to each
                     resource in the form of <i>tags</i>.</p>
             </div>
-        </div>
-        <div class='modal-footer'>
+        <div class='form-actions'>
             <button type="submit" class="btn btn-primary btn-large">
                 <i class="icon-play-circle icon-white"></i> <strong>Launch</strong>
             </button>
